@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+require 'thor'
+require 'zeitwerk'
+
+$LOAD_PATH << 'lib'
+
+require 'muhv'
+Muhv::Cli.start

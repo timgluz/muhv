@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gem 'config', '>= 2.0.0'
+
+gem 'dry-initializer', '~> 3.0.1'
+gem 'dry-monads', '>= 1.2.0'
+gem 'dry-transaction', '~> 0.13.0'
+gem 'dry-validation', '~> 1.2.0'
+gem 'dry-struct', '>= 1.0.0'
+gem 'dry-auto_inject', '>= 0.6.0'
+
+#gem 'honeybadger', '~> 4.1'
+
+gem 'zeitwerk', '>= 2.1'
+
+# on production Lambda, they will be included via layer
+group :development, :test do
+  # add Gemfile.exts deps also here
+  #gem 'nokogiri'
+end
+
+group :development, :test do
+  gem 'rb-readline'
+  gem 'rubocop',       require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-performance', require: false # Gets rid of warning message;
+
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'rack'
+  gem 'shotgun'
+end
+
+group :test do
+  gem 'capybara'
+  gem 'launchy'
+  gem 'rspec'
+  gem 'database_cleaner'
+  gem 'faker'
+  gem 'factory_bot'
+end
