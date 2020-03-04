@@ -46,5 +46,19 @@ module Muhv
 
       say 'Done.', :green
     end
+
+    desc 'service NAME', 'generates a new service into current folder'
+    def service(name)
+      if name.blank?
+        raise Error, 'Error: the service name can not be empty'
+      end
+
+      service_name = name # check how we could convert it to Module
+      say "Adding new service: #{service_name}", :green
+      generator = Muhv::Generators::DryService.new([service_name], options)
+      generator.invoke_all
+
+      say 'Done.', :green
+    end
   end
 end
