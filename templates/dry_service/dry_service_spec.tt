@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-RSpec.describe Services::<%= service_name %>, type: :service do
-  let(:subject) { Services::<%= service_name %> }
+RSpec.describe Services::<%= @service_name %>, type: :service do
+  let(:subject) { Services::<%= @service_name %> }
 
   let(:valid_params) do
     {

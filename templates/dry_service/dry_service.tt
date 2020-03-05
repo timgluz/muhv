@@ -1,18 +1,18 @@
 =begin
-  <%= service_name %> executes small atomic domain problem
+  <%= @service_name %> executes small atomic domain problem
 
   Usage:
 
-    <%= service_name %>.call(
-      message: "Hello from <%= service_name %>"
+    <%= @service_name %>.call(
+      message: "Hello from <%= @service_name %>"
     )
 =end
 
-class <%= service_name %> < BaseDryService
+class <%= @service_name %> < BaseDryService
   option :message
   option :from, optional: true, default: proc { 'unknown' }
 
-  <% if with_rules %>
+  <% if @with_rules %>
   # using rules
   ArgumentsSchema = Class.new(BaseValidator) do
     params do
@@ -34,6 +34,7 @@ class <%= service_name %> < BaseDryService
 
     optional(:from).maybe(:filled?, :str?)
   end
+  <% end %>
 
   # instance level `call` returns plain datatype without monad wrapper
   def call
@@ -43,6 +44,6 @@ class <%= service_name %> < BaseDryService
   private
 
   def publish_message
-    p "Got message: #{message}, from: #{ from }
+    p "Got message: #{message}, from: #{ from }"
   end
 end
