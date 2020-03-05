@@ -49,7 +49,7 @@ module Muhv
 
     desc 'service NAME', 'generates a new service into current folder'
     def service(name)
-      if name.blank?
+      if name.nil? || name.empty?
         raise Error, 'Error: the service name can not be empty'
       end
 
