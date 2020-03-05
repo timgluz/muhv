@@ -4,14 +4,23 @@ module Muhv
     class DryService < Thor::Group
       include Thor::Actions
 
-      argument :name, desc: 'filename of the service'
-      class_option :target_folder,
-                   type: :string,
-                   desc: 'fullpath to target folder'
-
       DEFAULT_TEMPLATE_VALUES = {
         with_rules: true
       }
+
+      DEFAULT_TARGET_PATH = 'app/services'
+      DEAULT_FILE_EXT = 'rb'
+
+      argument :name, desc: 'filename of the service'
+      option :target_folder,
+             type: :string,
+             desc: 'fullpath to target folder',
+             default: DEFAULT_TARGET_FOLDER
+
+      option :file_ext,
+             type: :string,
+             desc: 'file extensions for the generated file, default: rb',
+             default: DEFAULT_FILE_EXT
 
       def self.source_root
         File.expand_path('../../../', __dir__)
@@ -28,7 +37,7 @@ module Muhv
 
       def generate_class
         file_name = "#{name}_service"
-        file_ext = "rb"
+        file_ext = options[:file_ext]
         file_path = [target_folder, "#{file_name}.#{file_ext}"].compact.join('/')
         service_name = inflect_service_name(file_name)
 
@@ -50,7 +59,11 @@ module Muhv
       private
 
       def inflect_service_name(file_name)
-        Dry::Inflector.new.camelize(filename)
+        Dry::Inflector.new.camelize(file_name)
+      end
+
+      def target_folder
+        options.fetch(:target_folder) { DEFAULT_TARGET_PATH }
       end
     end
   end
