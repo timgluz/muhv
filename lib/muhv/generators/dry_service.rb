@@ -4,66 +4,55 @@ module Muhv
     class DryService < Thor::Group
       include Thor::Actions
 
-      DEFAULT_TEMPLATE_VALUES = {
-        with_rules: true
-      }
-
-      DEFAULT_TARGET_PATH = 'app/services'
-      DEAULT_FILE_EXT = 'rb'
-
       argument :name, desc: 'filename of the service'
-      option :target_folder,
-             type: :string,
-             desc: 'fullpath to target folder',
-             default: DEFAULT_TARGET_FOLDER
-
-      option :file_ext,
-             type: :string,
-             desc: 'file extensions for the generated file, default: rb',
-             default: DEFAULT_FILE_EXT
-
       def self.source_root
         File.expand_path('../../../', __dir__)
       end
 
-      def add_parent_class
-        if yes?('Does project already has BaseDryService class?')
-          copy_file 'static/dry_service/base_dry_service.rb'
-          say 'Add BaseDryService', :green
-        else
-          say 'Ignoring BaseDryService'
-        end
-      end
-
-      def generate_class
-        file_name = "#{name}_service"
+      def generate_service
+        file_name = build_file_name name, prefix: 'service', options
         file_ext = options[:file_ext]
-        file_path = [target_folder, "#{file_name}.#{file_ext}"].compact.join('/')
-        service_name = inflect_service_name(file_name)
+        target_folder = options[:target_path]
 
-        template_values = {
-          service_name: service_name
-        }.merge(DEFAULT_TEMPLATE_VALUE)
+        file_path = join_as_path(target_folder, "#{file_name}.#{file_ext}")
+        @service_name = inflect_service_name(file_name)
+        @with_rules = options.fetch(:with_rules, true)
 
-        if yes?('Do you want to use validation without rules?')
-          template_values[:with_rules] = false
-        end
-
-        template 'templates/dry_service/service.tt',
-                 file_path,
-                 context: template_values
+        template 'templates/dry_service/dry_service.tt', file_path
 
         say "Add new service: #{file_path}", :green
       end
 
+      def generate_spec
+        file_name = build_file_name name, prefix: 'service', options
+        spec_file_name = build_file_name name, prefix: 'service_spec', options
+        spec_path = options[:spec_path]
+        file_ext = options[:file_ext]
+        file_path = join_as_path(spec_path, "#{file_name}_spec.#{file_ext}")
+
+        @service_name = inflect_service_name(file_name)
+        @with_rules = options.fetch(:with_rules, true)
+        template 'templates/dry_service/dry_service_spec.tt', file_path
+
+        say "Add new spec: #{file_path}", :green
+      end
+
       private
+
+      def build_file_name(name, prefix: nil, add_prefix: true)
+        file_name = name.to_s.strip
+        file_name += "_" + prefix.to_s.strip if add_prefix
+
+        file_name
+      end
+
+      # TODO: check lib from std-lib that would work also on windows
+      def join_as_path(*items, separator: '/')
+        items.compact.join(separator)
+      end
 
       def inflect_service_name(file_name)
         Dry::Inflector.new.camelize(file_name)
-      end
-
-      def target_folder
-        options.fetch(:target_folder) { DEFAULT_TARGET_PATH }
       end
     end
   end

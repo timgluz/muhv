@@ -4,6 +4,10 @@ require 'muhv/generators'
 module Muhv
   # this glass combines and calls sub generators
   class Cli < Thor
+    DEFAULT_SERVICE_TARGET_PATH = 'app/services'.freeze
+    DEFAULT_SERVICE_SPEC_PATH = 'spec/services'.freeze
+    DEFAULT_SERVICE_FILE_EXT = 'rb'.freeze
+
     check_unknown_options!
 
     desc 'version', 'Display MyGem version'
@@ -48,6 +52,31 @@ module Muhv
     end
 
     desc 'service NAME', 'generates a new service into current folder'
+    option :target_path,
+           type: :string,
+           desc: 'fullpath to target folder',
+           default: DEFAULT_SERVICE_TARGET_PATH
+
+    option :spec_path,
+           type: :string,
+           desc: 'path to spec folder, default spec/services',
+           default: DEFAULT_SERVICE_SPEC_PATH
+
+    option :file_ext,
+           type: :string,
+           desc: 'file extensions for the generated file, default: rb',
+           default: DEFAULT_SERVICE_FILE_EXT
+
+    option :with_rules,
+           type: :boolean,
+           desc: 'if true it would use validator with rules, otherwise basic schema',
+           default: true
+
+    option :with_prefix,
+           type: :boolean,
+           desc: 'add Service prefix to the class name if true',
+           default: true
+
     def service(name)
       if name.nil? || name.empty?
         raise Error, 'Error: the service name can not be empty'
