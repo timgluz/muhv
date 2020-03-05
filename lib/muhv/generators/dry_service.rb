@@ -4,7 +4,7 @@ module Muhv
     class DryService < Thor::Group
       include Thor::Actions
 
-      argument :name, desc: 'service name'
+      argument :name, desc: 'filename of the service'
       class_option :target_folder,
                    type: :string,
                    desc: 'fullpath to target folder'
@@ -27,10 +27,13 @@ module Muhv
       end
 
       def generate_class
-        file_path = [target_folder, "#{name}_service.rb"].compact.join('/')
+        file_name = "#{name}_service"
+        file_ext = "rb"
+        file_path = [target_folder, "#{file_name}.#{file_ext}"].compact.join('/')
+        service_name = inflect_service_name(file_name)
 
         template_values = {
-          service_name: name
+          service_name: service_name
         }.merge(DEFAULT_TEMPLATE_VALUE)
 
         if yes?('Do you want to use validation without rules?')
@@ -42,6 +45,12 @@ module Muhv
                  context: template_values
 
         say "Add new service: #{file_path}", :green
+      end
+
+      private
+
+      def inflect_service_name(file_name)
+        Dry::Inflector.new.camelize(filename)
       end
     end
   end

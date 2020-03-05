@@ -1,16 +1,12 @@
 require 'spec_helper'
 
-RSpec.describe DryServices::S3::FetchFileService, type: :service do
-  let(:subject) { DryServices::S3::FetchFileService }
-  let(:mock_s3_client) { double('Mock::S3::Client') }
-  let(:test_bucket) { 'creditshelf-mhb-staging' }
-  let(:test_s3_key) { 'test/call_results.csv' }
+RSpec.describe Services::<%= service_name %>, type: :service do
+  let(:subject) { Services::<%= service_name %> }
 
   let(:valid_params) do
     {
-      s3_client: mock_s3_client,
-      bucket_name: test_bucket,
-      file_path: test_s3_key
+      message: 'Hello folks',
+      from: 'service spec'
     }
   end
 
@@ -23,29 +19,19 @@ RSpec.describe DryServices::S3::FetchFileService, type: :service do
 
     context 'optional s3_client' do
       it 'passes the validation and used DI version' do
-        invalid_params = valid_params.dup
-        invalid_params.delete(:s3_client)
+        only_required_params = valid_params.dup
+        only_required_params.delete(:from)
 
-        expect(subject.validate(subject::ArgumentsSchema, invalid_params)).to be_success
+        expect(subject.validate(subject::ArgumentsSchema, only_required_params)).to be_success
       end
     end
 
-    context 'invalid bucket name' do
+    context 'missing required param' do
       it 'returns failure' do
         invalid_params = valid_params.dup
-        invalid_params.delete(:bucket_name)
+        invalid_params.delete(:message)
 
         expect(subject.validate(subject::ArgumentsSchema, invalid_params)).to be_failure
-      end
-    end
-  end
-
-  describe 'init_s3_object' do
-    let(:instance) { subject.new(**valid_params) }
-
-    context 'with valid_params' do
-      it 'returns initialized s3 object' do
-        expect(instance.send(:init_s3_object)).not_to be_nil
       end
     end
   end
@@ -55,35 +41,17 @@ RSpec.describe DryServices::S3::FetchFileService, type: :service do
       subject.new(**valid_params)
     end
 
-    context 'if file doesnt exists' do
-      it 'returns failure' do
-        allow(instance).to receive(:fetch_s3_object) { raise IOError.new('Mock OOPS') }
-
-        expect { instance.call }.to raise_error(IOError)
+    context 'success case' do
+      it 'returns initialized app_specific IO' do
+        expect(instance.call).to be_success
       end
     end
 
-    context 'success case' do
-      let(:test_file_content) { 'h1,h2,h3' }
-      let(:test_content_type) { 'text/csv' }
+    context 'subfunction fails' do
+      it 'returns failure' do
+        allow(instance).to receive(:publish_message) { raise IOError.new('Mock OOPS') }
 
-      let(:mock_s3_file_data) { double('Mock::S3::HeadObjectOutput', content_type: test_content_type) }
-      let(:mock_object) do
-        double('Mock::S3::Object', exists?: true, data: mock_s3_file_data)
-      end
-
-      it 'returns initialized app_specific IO' do
-        allow(instance).to receive(:init_s3_object).and_return(mock_object)
-        allow(instance).to receive(:s3_object_content).and_return(test_file_content)
-
-        allow(mock_s3_file_data).to receive(:content_type).and_return(test_content_type)
-
-        res = instance.call
-        expect(res).not_to be_nil
-
-        expect(res.filepath).to eq(test_s3_key)
-        expect(res.content_type).to eq(test_content_type)
-        expect(res.read).to eq(test_file_content)
+        expect { instance.call }.to raise_error(IOError)
       end
     end
   end

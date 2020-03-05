@@ -48,10 +48,18 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib', 'templates', 'static']
 
   spec.add_dependency 'zeitwerk', '>= 2.3'
+  spec.add_dependency 'dry-inflector', '>= 0.2'
 
   spec.add_development_dependency 'bundler', '~> 2'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'thor', '~> 1'
   spec.add_development_dependency 'overcommit', '~> 0.52'
+
+  # dependencies used by generated services to make tests work and keep eye on deps
+  spec.add_development_dependency 'dry-auto_inject', '>= 0.6', '< 1'
+  spec.add_development_dependency 'dry-initializer', '>= 3', '< 4'
+  spec.add_development_dependency 'dry-monads', '>= 1.0', '< 2.0'
+  spec.add_development_dependency 'dry-validation', '>= 1.0', '< 2.0'
+  spec.add_development_dependency 'dry-struct', '>= 1.0', '< 2.0'
 end
