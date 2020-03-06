@@ -82,9 +82,7 @@ module Muhv
         raise Error, 'Error: the service name can not be empty'
       end
 
-      service_name = name # check how we could convert it to Module
-      say "Adding new service: #{service_name}", :green
-      generator = Muhv::Generators::DryService.new([service_name], options)
+      generator = Muhv::Generators::DryService.new([name], options)
       generator.invoke_all
 
       say 'Done.', :green

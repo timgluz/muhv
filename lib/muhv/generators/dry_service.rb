@@ -10,7 +10,6 @@ module Muhv
       end
 
       def generate_service
-        p options.to_h
         file_name = build_file_name(
           name, prefix: 'service', with_prefix: options[:with_prefix]
         )
