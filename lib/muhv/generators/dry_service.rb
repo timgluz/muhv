@@ -29,8 +29,10 @@ module Muhv
         file_name = build_file_name(
           name, prefix: 'service', with_prefix: options[:with_prefix]
         )
+
+        with_spec_prefix = options.fetch(:with_spec_prefix, true)
         spec_file_name = build_file_name(
-          name, prefix: 'service_spec', with_prefix: options[:with_prefix]
+          file_name, prefix: 'spec', with_prefix: with_spec_prefix
         )
         spec_path = options[:spec_path]
         file_ext = options[:file_ext]
@@ -45,11 +47,11 @@ module Muhv
 
       private
 
-      def build_file_name(name, prefix: nil, with_prefix: true)
+      def build_file_name(name, prefix: nil, with_prefix: nil)
         file_name = name.to_s.strip
         prefix = prefix.to_s.strip.downcase
 
-        if with_prefix && prefix.size > 0
+        if with_prefix && !prefix.empty?
           file_name += '_' + prefix
         end
 

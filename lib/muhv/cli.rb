@@ -77,6 +77,10 @@ module Muhv
            desc: 'add Service prefix to the class name if true',
            default: true
 
+    option :with_spec_prefix,
+           type: :boolean,
+           desc: 'set false if you dont want to have spec in test file',
+           default: true
     def service(name)
       if name.nil? || name.empty?
         raise Error, 'Error: the service name can not be empty'

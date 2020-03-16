@@ -23,7 +23,7 @@ class <%= @service_name %> < BaseDryService
 
     rule(:not_from_space) do
       x = value.first
-      if x =~ /world/g
+      if x.match?(/world/i)
         key(:not_from_space).failure('Message has too wide audience.')
       end
     end
