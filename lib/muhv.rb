@@ -1,4 +1,5 @@
 require 'zeitwerk'
+require 'dry/inflector'
 
 # load code
 loader = Zeitwerk::Loader.for_gem

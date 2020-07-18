@@ -1,0 +1,49 @@
+=begin
+  <%= @service_name %> executes small atomic domain problem
+
+  Usage:
+
+    <%= @service_name %>.call(
+      message: "Hello from <%= @service_name %>"
+    )
+=end
+
+class <%= @service_name %> < BaseDryService
+  option :message
+  option :from, optional: true, default: proc { 'unknown' }
+
+  <% if @with_rules %>
+  # using rules
+  ArgumentsSchema = Class.new(BaseValidator) do
+    params do
+      required(:message).filled
+
+      optional(:from).maybe(:filled?, :str?)
+    end
+
+    rule(:not_from_space) do
+      x = value.first
+      if x.match?(/world/i)
+        key(:not_from_space).failure('Message has too wide audience.')
+      end
+    end
+  end
+  <% else %>
+  ArgumentsSchema = Dry::Schema.Params do
+    required(:message).filled(:str?)
+
+    optional(:from).maybe(:filled?, :str?)
+  end
+  <% end %>
+
+  # instance level `call` returns plain datatype without monad wrapper
+  def call
+    publish_message
+  end
+
+  private
+
+  def publish_message
+    p "Got message: #{message}, from: #{ from }"
+  end
+end

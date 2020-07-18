@@ -1,0 +1,58 @@
+require 'spec_helper'
+
+RSpec.describe <%= @service_name %>, type: :service do
+  let(:subject) { <%= @service_name %> }
+
+  let(:valid_params) do
+    {
+      message: 'Hello folks',
+      from: 'service spec'
+    }
+  end
+
+  describe 'validate' do
+    context 'valid arguments' do
+      it 'returns success' do
+        expect(subject.validate(subject::ArgumentsSchema, valid_params)).to be_success
+      end
+    end
+
+    context 'optional s3_client' do
+      it 'passes the validation and used DI version' do
+        only_required_params = valid_params.dup
+        only_required_params.delete(:from)
+
+        expect(subject.validate(subject::ArgumentsSchema, only_required_params)).to be_success
+      end
+    end
+
+    context 'missing required param' do
+      it 'returns failure' do
+        invalid_params = valid_params.dup
+        invalid_params.delete(:message)
+
+        expect(subject.validate(subject::ArgumentsSchema, invalid_params)).to be_failure
+      end
+    end
+  end
+
+  describe 'call' do
+    let(:instance) do
+      subject.new(**valid_params)
+    end
+
+    context 'success case' do
+      it 'returns initialized app_specific IO' do
+        expect(instance.call).to be_success
+      end
+    end
+
+    context 'subfunction fails' do
+      it 'returns failure' do
+        allow(instance).to receive(:publish_message) { raise IOError.new('Mock OOPS') }
+
+        expect { instance.call }.to raise_error(IOError)
+      end
+    end
+  end
+end

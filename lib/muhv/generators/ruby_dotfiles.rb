@@ -8,7 +8,7 @@ module Muhv
       argument :target_folder, type: :string, desc: 'fullpath to target'
 
       def self.source_root
-        File.expand_path("../../../..", __FILE__)
+        File.expand_path('../../../', __dir__)
       end
 
       def copy_gitignore
